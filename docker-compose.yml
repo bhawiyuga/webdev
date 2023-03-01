@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  web:
+    image: nginx:stable-alpine
+    restart: always
+    ports:
+      - '8000:80'
+    volumes:
+      - /home/ubuntu/project/web:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php-fpm
+      - db
+  php-fpm:
+    image: php:8-fpm
+    volumes:
+      - /home/ubuntu/project/web:/var/www/html
+  db:
+    image: mariadb
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./.data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
